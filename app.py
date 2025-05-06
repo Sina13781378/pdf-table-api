@@ -1,10 +1,12 @@
 from flask import Flask, request, send_file
+from flask_cors import CORS
 import pdfplumber
 import pandas as pd
 import os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS
 
 @app.route('/upload', methods=['POST'])
 def upload_pdf():
