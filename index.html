@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PDF Table Extractor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body { font-family: Arial; padding: 2rem; background: #f4f4f4; }
+      .upload-box { background: white; padding: 2rem; border-radius: 8px; max-width: 500px; margin: auto; }
+      textarea { width: 100%; height: 60px; margin: 10px 0; }
+      button { background: #4caf50; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+      #ai-response { margin-top: 20px; }
+    </style>
+  </head>
+  <body>
+    <div class="upload-box">
+      <h2>Upload PDF and Extract Tables</h2>
+      <input type="file" id="fileInput" />
+      <button onclick="sendToAI()">Upload & Extract</button>
+      <div id="ai-response"></div>
+    </div>
+
+    <script>
+      async function sendToAI() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const responseBox = document.getElementById('ai-response');
+
+        if (!file) {
+          alert('Please upload a file.');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        responseBox.innerHTML = '⏳ Processing...';
+
+        try {
+          const res = await fetch('https://your-server.com/upload', {  // change this to your deployed backend URL
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(errorText);
+          }
+
+          const blob = await res.blob();
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = 'extracted_table.xlsx';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+
+          responseBox.innerHTML = '✅ Excel file downloaded.';
+        } catch (err) {
+          responseBox.innerHTML = `<span style="color: red;">❌ Error: ${err.message}</span>`;
+        }
+      }
+    </script>
+  </body>
+</html>
